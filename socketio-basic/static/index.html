@@ -24,6 +24,13 @@
       backdrop-filter: blur(10px);
     }
 
+    #nickname {
+      border: none;
+      padding: 0 1rem;
+      margin: 0.25rem;
+      width: 8rem;
+    }
+
     #input {
       border: none;
       padding: 0 1rem;
@@ -36,7 +43,7 @@
       outline: none;
     }
 
-    #form>button {
+    #send-button {
       background: #333;
       border: none;
       padding: 0 1rem;
@@ -65,16 +72,40 @@
 <body>
   <ul id="messages"></ul>
   <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
+    <input id="nickname" autocomplete="off" placeholder="닉네임 입력 후 엔터" />
+    <input id="input" autocomplete="off" disabled /><button id="send-button" disabled>Send</button>
   </form>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <script>
     const socket = io();
-
     const form = document.getElementById('form');
     const input = document.getElementById('input');
+    const sendButton = document.getElementById('send-button');
     const messages = document.getElementById('messages');
+    const nicknameInput = document.getElementById('nickname');
+    let userList = [];
+    let nickname = '';
+
+    function addMsg(content, from) {
+      const item = document.createElement('li');
+      item.textContent = from ? `[${from}] ${content}` : content;
+      messages.append(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    nicknameInput.addEventListener('keydown', ({ key, isComposing }) => {
+      if (isComposing) return;
+      if (key !== 'Enter') return;
+
+      nickname = nicknameInput.value;
+
+      socket.emit('join', nickname);
+
+      nicknameInput.setAttribute('disabled', '');
+      input.removeAttribute('disabled');
+      sendButton.removeAttribute('disabled');
+    })
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -84,12 +115,23 @@
       }
     });
 
-    socket.on('chat message', (msg) => {
-      const item = document.createElement('li');
-      item.textContent = msg;
-      messages.append(item);
-      window.scrollTo(0, document.body.scrollHeight);
+    socket.on('chat message', (data) => {
+      addMsg(data.message, data.from.nickname);
     });
+
+    socket.on('system', (message) => {
+      addMsg(message);
+    })
+
+    socket.on('join', (data) => {
+      addMsg(`${data.new.nickname}님이 접속했습니다.`);
+      userList = data.users;
+      console.log(userList);
+    })
+
+    socket.on('disconnect', () => {
+      addMsg('서버와의 연결이 끊어졌습니다.');
+    })
   </script>
 </body>
 
