@@ -1,0 +1,52 @@
+{
+  "name": "socketio-basic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "cross-spawn": "^7.0.3",
+    "dotenv": "^16.3.1",
+    "duplexer": "^0.1.2",
+    "event-stream": "^3.3.4",
+    "express": "^4.18.2",
+    "from": "^0.1.7",
+    "isexe": "^2.0.0",
+    "map-stream": "^0.1.0",
+    "node-cleanup": "^2.1.2",
+    "path-key": "^3.1.1",
+    "pause-stream": "^0.0.11",
+    "ps-tree": "^1.2.0",
+    "shebang-command": "^2.0.0",
+    "shebang-regex": "^3.0.0",
+    "socket.io": "^4.7.2",
+    "split": "^0.3.3",
+    "stream-combiner": "^0.0.4",
+    "string-argv": "^0.3.2",
+    "through": "^2.3.8",
+    "tsc-watch": "^6.0.4",
+    "which": "^2.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint --fix src/**/*.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.8.3",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-standard-with-typescript": "^39.1.1",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^16.1.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  }
+}
