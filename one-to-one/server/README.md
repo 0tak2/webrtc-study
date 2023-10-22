@@ -23,9 +23,9 @@ mkcert -key-file key.pem -cert-file cert.pem localhost 127.0.0.1 ::1 192.168.1.7
 
 2. CORS 허용할 클라이언트 호스트 지정
 
-프로젝트 루트의 .env.local.example를 .env.local로 복사하고, 프론트엔드의 호스트를 입력하여 저장합니다.
+프로젝트 루트의 .env.example를 .env로 복사하고, 프론트엔드의 호스트를 입력하여 저장합니다.
 
-3. 개발 서버 시작
+1. 개발 서버 시작
 
 프로젝트 루트에서 다음을 실행하여 개발 서버를 시작합니다.
 
