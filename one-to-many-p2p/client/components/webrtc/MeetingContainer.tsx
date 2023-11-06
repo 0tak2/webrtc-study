@@ -50,7 +50,7 @@ export default function MeetingContainer() {
     const [users, setUsers] = useState<Array<UserAndStream>>([]);
 
     const pcs: UserAndPc = {};
-    let localStream: MediaStream;
+    let localStream = useRef<MediaStream>();
     let socketRef = useRef<Socket>();
     let localVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -82,9 +82,7 @@ export default function MeetingContainer() {
                 if (socketRef.current &&
                     user.id === socketRef.current.id) return;
 
-                createPc(user.id, user.username);
-
-                const pc: RTCPeerConnection = pcs[user.id];
+                const pc = createPc(user.id, user.username);
 
                 createOffer(pc, user.id);
             });
@@ -130,7 +128,7 @@ export default function MeetingContainer() {
                     localVideoRef.current.srcObject = stream;
                 }
 
-                localStream = stream;
+                localStream.current = stream;
 
                 socketRef.current.emit('join_room', {
                     room: inputs.room,
@@ -171,10 +169,9 @@ export default function MeetingContainer() {
     };
 
     const createAnswer = (offer: OfferPayload) => {
-        const pc: RTCPeerConnection = pcs[offer.senderId];
+        const pc = createPc(offer.senderId, offer.senderUsername);
         console.log('[createAnswer] current pcs: ', pcs);
         console.log('[createAnswer] offer: ', offer);
-        
 
         pc.setRemoteDescription(new RTCSessionDescription(offer.sdp))
             .then(() => {
@@ -223,7 +220,7 @@ export default function MeetingContainer() {
         pc.ontrack = (event) => {
             console.log('ontrack');
 
-            // 해당 ID의 유저가 저장되어 있는 경우 제외해준다
+            // 현재 ID의 유저는 제외해준다
             setUsers(oldUsers => oldUsers.filter(user => user.id !== receiverId));
 
             setUsers(oldUsers => [
@@ -234,17 +231,20 @@ export default function MeetingContainer() {
                     stream: event.streams[0],
                 }
             ]);
-
-            if (localStream) {
-                localStream.getTracks().forEach(track => {
-                    pc.addTrack(track, localStream);
-                })
-                console.log('successfully add track to pc: ', pc);
-            } else {
-                console.error('no local stream error on adding track to pc: ', pc);
-                
-            }
         };
+        
+        if (localStream.current) {
+            localStream.current.getTracks().forEach(track => {
+                if (localStream.current)
+                    pc.addTrack(track, localStream.current);
+            })
+            console.log('successfully add track to pc: ', pc);
+        } else {
+            console.error('no local stream error on adding track to pc: ', pc);
+            
+        }
+
+        return pc;
     }
 
     return (
@@ -266,20 +266,23 @@ export default function MeetingContainer() {
                 </ul>
             </div>
 
-            <video
-                muted
-                ref={localVideoRef}
-                autoPlay
-                playsInline
-            ></video>
+            <div>
+                <video
+                    muted
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                ></video>
+                <div>
+                    <span>나</span>
+                </div>
+            </div>
 
-            {users.map((UserAndStream, idx) => (
-                    <>asdfasdf
-                    <RemoteVideo
-                        key={idx}
-                        username={UserAndStream.username}
-                        stream={UserAndStream.stream} />
-                        </>
+            {users.map((user, idx) => (
+                <RemoteVideo
+                    key={idx}
+                    username={user.username}
+                    stream={user.stream} />
             ))}
         </div>
     )

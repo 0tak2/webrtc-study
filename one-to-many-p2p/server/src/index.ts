@@ -89,9 +89,9 @@ io.on('connection', (socket) => {
       `[${socketToRoom[socket.id]}]: New user (${socket.id}) entered.`,
     );
 
-    io.sockets.to(socket.id).emit(
+    socket.emit(
       'user_list',
-      userListByRoom[data.room],
+      userListByRoom[data.room].filter((user) => user.id !== socket.id),
     );
   });
 
